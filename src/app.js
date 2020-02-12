@@ -1,5 +1,3 @@
 import "./styles/main.scss";
+import "./js/index";
 
-const index = require("./index.handlebars");
-
-alert("works");

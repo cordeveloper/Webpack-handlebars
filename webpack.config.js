@@ -4,6 +4,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackNotifier = require('webpack-notifier');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 
 
 
@@ -11,11 +13,11 @@ module.exports = env => {
   
   const dev = env.development;
   const prod = !env.development;
-  
+
   return {
-    entry: './src/app.js',
+    entry: ['@webcomponents/webcomponentsjs','./src/app.js'],
     output: {
-      path:  path.resolve(__dirname,'../dist'),
+      path:  path.resolve(__dirname,'dist'),
       filename: 'bundle.js'
     },
     module: {
@@ -32,17 +34,17 @@ module.exports = env => {
               }
             },
     
-            'css-loader', 'sass-loader'
+            'css-loader', 'postcss-loader', 'sass-loader'
           ]
         },
         {
-          test: /\.(jpg|png|gif|jpeg)$/,
+          test: /\.(jpg|png|gif|jpeg|svg)$/,
           use: [
             {
               loader: 'file-loader',
               options: {
                 name: '[name].[ext]',
-                outputPath: 'assets/img',
+                outputPath: './assets/img',
                 esModule: false,
               }
             }
@@ -74,6 +76,19 @@ module.exports = env => {
           }
         },
         {
+          test: /\.(ttf|woff|woff2|eot|svg)$/i,
+          exclude: ['/img/','/image/'],
+          use: [
+              {
+                  loader: 'file-loader',
+                  options: {
+                      outputPath: 'assets/webfonts',
+                      name: '[name].[ext]'
+                  }
+              }
+          ]
+        },
+        {
           test: /\.handlebars$/,
           use: [
             {
@@ -83,6 +98,18 @@ module.exports = env => {
               }
             },
           ]
+        },
+        { test: /\.js$/, 
+          exclude: '/node_modules/', 
+          loader: {
+              loader: 'babel-loader',
+              options: {
+                  presets: [
+                      '@babel/preset-env'
+                  ]
+              }
+          },
+          
         }
         
       ]
@@ -106,7 +133,16 @@ module.exports = env => {
       new WebpackNotifier(
         {contentImage: path.resolve(__dirname, '../webpack.png')}
     ),
-    ]
+    ],
+    devServer: {
+      port: 4200,
+      //hot: dev
+    },
+   /*  optimization: {
+      splitChunks: {
+        chunks: dev ? 'async' : 'all'
+      }
+    } */
   }
    
 }
