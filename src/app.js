@@ -1,2 +1,5 @@
-require('./styles/main.css');
-alert('works');
+import "./styles/main.scss";
+
+const index = require("./index.handlebars");
+
+alert("works");
