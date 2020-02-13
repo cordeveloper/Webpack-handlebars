@@ -39,6 +39,7 @@ module.exports = env => {
         },
         {
           test: /\.(jpg|png|gif|jpeg|svg)$/,
+          exclude: [/webfonts/],
           use: [
             {
               loader: 'file-loader',
@@ -77,7 +78,7 @@ module.exports = env => {
         },
         {
           test: /\.(ttf|woff|woff2|eot|svg)$/i,
-          exclude: ['/img/','/image/'],
+          exclude: [/img/,/image/],
           use: [
               {
                   loader: 'file-loader',
