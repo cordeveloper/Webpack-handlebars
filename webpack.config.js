@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackNotifier = require('webpack-notifier');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
 
 
@@ -116,6 +117,7 @@ module.exports = env => {
       ]
     },
     plugins: [
+      new webpack.ProgressPlugin(),
       new CleanWebpackPlugin(),
       new MiniCssExtractPlugin({
         filename: 'css/style.css'
