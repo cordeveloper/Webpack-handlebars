@@ -13,6 +13,7 @@ const prod = !dev;
 
 module.exports = {
 
+  // Se carga primero el polifyll para webcomponents nativos
   entry: ['@webcomponents/webcomponentsjs', './src/app.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -22,10 +23,17 @@ module.exports = {
     rules: [{
         test: /\.(sa|sc|c)ss$/,
         use: [{
+            /*
+              Se carga el archivo de sass desde el app.js,
+              se hacen las modificiones de autoprefixer con postcss-loader,
+              se carga el css resultante en el bundle.js,
+              se extrae el css a un archivo externo con MiniCssExtractPlugin.
+            */
             loader: MiniCssExtractPlugin.loader,
             options: {
               hmr: dev,
               reloadAll: true,
+              // publicPath añadira ../ a todas las url relativas de las depencias del css (fuentes e imágenes).
               publicPath: '../'
             }
           },
@@ -34,6 +42,8 @@ module.exports = {
         ]
       },
       {
+        // Procesa todas las dependencias de imagenes del css, html y js excluyendo las que contengan en 
+        // la ruta webfonts
         test: /\.(jpg|png|gif|jpeg|svg)$/,
         exclude: [/webfonts/],
         use: [{
@@ -70,6 +80,8 @@ module.exports = {
           }
         }
       },
+      // Procesa todas las dependencias de fuentes del css excluyendo las que contengan en 
+      // la ruta img e image
       {
         test: /\.(ttf|woff|woff2|eot|svg)$/i,
         exclude: [/img/, /image/],
@@ -81,6 +93,7 @@ module.exports = {
           }
         }]
       },
+      // Procesa los archivos hdl, requiere como dependencias de imagenes las url que contengan /assets/img
       {
         test: /\.handlebars$/,
         use: [{
@@ -107,11 +120,15 @@ module.exports = {
     ]
   },
   plugins: [
+    // Indica en porcentaje el porcentaje de compilado
     new webpack.ProgressPlugin(),
+    // Regenera todos los assets en cada ejecución de Webpack
     new CleanWebpackPlugin(),
+    // Determina la salida del css
     new MiniCssExtractPlugin({
       filename: 'css/style.css'
     }),
+    // Define los template html
     new HtmlWebpackPlugin({
       template: './src/index.handlebars',
       minify: {
@@ -127,10 +144,12 @@ module.exports = {
       contentImage: path.resolve(__dirname, '../webpack.png')
     }),
   ],
+  // La opcion hot a false no recargará el browser cuando haya cambios
   devServer: {
     port: 4200,
     //hot: dev
   },
+  // Permite trocear los assets resultantes en dist en varios archivos
   /*  optimization: {
      splitChunks: {
        chunks: dev ? 'async' : 'all'
